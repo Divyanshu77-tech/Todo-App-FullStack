@@ -7,7 +7,7 @@ const userSchema = mongoose.Schema({
   todos: [
     {
       type: Schema.Types.ObjectId,
-      ref: "Todo  ",
+      ref: "Todo",
     },
   ],
 });
