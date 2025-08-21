@@ -9,7 +9,7 @@ async function connectDb() {
     await mongoose.connect(`${MONGO_URI}Todo-DB`);
     console.log("DB connection successful")
   } catch (error) {
-    console.log(`DB connection error ${error.message}`);
+    console.log(`DB connection error - ${error}`);
     process.exit(1)
   }
 };
