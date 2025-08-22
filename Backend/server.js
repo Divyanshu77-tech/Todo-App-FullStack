@@ -1,17 +1,18 @@
 import dotenv from "dotenv";
 dotenv.config();
 import app from "./Src/app.js";
-import connectDb from "./Src/Config/db.js";
+import connectDb from "./Src/config/db.js";
+import logger from "./Src/config/logger.js";
 const PORT = process.env.PORT;
 
 async function startServer() {
   try {
     await connectDb();
     app.listen(PORT, () => {
-      console.log(`Server is listening on PORT ${PORT}`);
+      logger.info(`Server is listening on PORT ${PORT}`);
     });
   } catch (error) {
-    console.log(`Server connection error ${error.message}`)
+    logger.error(`Server connection error - ${error.message}`, {stack: error.stack})
   }
 }
 
