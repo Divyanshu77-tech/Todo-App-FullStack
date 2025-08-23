@@ -1,9 +1,20 @@
 import mongoose, { Schema } from "mongoose";
+import { string } from "zod";
 
 const userSchema = mongoose.Schema({
-  name: String,
-  email: String,
-  password: String,
+  name: {
+    type: String,
+    required: true,
+  },
+  email: {
+    type: string,
+    required: true,
+    unique: true,
+  },
+  password: {
+    type: String,
+    required: true,
+  },
   todos: [
     {
       type: Schema.Types.ObjectId,

@@ -2,7 +2,15 @@ import mongoose, { Schema } from "mongoose";
 
 const todoSchema = mongoose.Schema(
   {
-    title: String,
+    title: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    description: {
+      type: String,
+      trim: true,
+    },
     completed: {
       type: Boolean,
       default: false,
@@ -12,8 +20,9 @@ const todoSchema = mongoose.Schema(
       default: Date.now,
     },
     user: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "User",
+      required: true,
     },
   },
   { timestamps: true }
