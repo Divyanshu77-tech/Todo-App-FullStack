@@ -1,9 +1,7 @@
 import dotenv from "dotenv";
 dotenv.config();
-import userModel from "../models/user.model.js";
 import jwt from "jsonwebtoken";
 import logger from "../config/logger.js";
-import { success } from "zod";
 const JWT_SECRET = process.env.JWT_SECRET;
 
 async function isAuthenticated(req, res, next) {
