@@ -3,6 +3,7 @@ import * as z from "zod";
 const signinSchema = z.object({
   email: z
     .string()
+    .trim()
     .email({ message: "Please enter a valid email" })
     .refine(
       (val) => {
@@ -22,6 +23,7 @@ const signinSchema = z.object({
     ),
   password: z
     .string()
+    .trim()
     .min(8, { message: "Password must contain 8 characters" })
     .max(18, { message: "Password must not exceed 18 characters" })
     .regex(/[~!@#$%^&*()_+\-=\[\]{}|;:'",.<>/?]/, {

@@ -10,6 +10,7 @@ import findUser from "../utils/find.user.js";
 import comparePassword from "../utils/compare.pass.js";
 import verifyToken from "../middleware/verifyToken.js";
 import logger from "../config/logger.js";
+import { success } from "zod";
 
 userRouter.post("/signup", async (req, res) => {
   try {
@@ -19,7 +20,11 @@ userRouter.post("/signup", async (req, res) => {
         return err.message;
       });
       logger.warn("Signup failed: invalid input", { error: formattedError });
-      return res.status(400).json({ errors: formattedError });
+      return res.status(400).json({
+        success: false,
+        message: "Signup failed: invalid input",
+        error: formattedError,
+      });
     }
     const { name, email, password } = parsedData.data;
     const existingUser = await checkExistingUser(email);
@@ -36,10 +41,12 @@ userRouter.post("/signup", async (req, res) => {
     res.status(201).json({
       success: true,
       message: "Signup successful",
-      user: {
-        id,
-        name: newUser.name,
-        email: newUser.email,
+      data: {
+        user: {
+          id,
+          name: newUser.name,
+          email: newUser.email,
+        },
       },
     });
     logger.info(`User signup: successfull email - ${newUser.email}`);
@@ -57,7 +64,11 @@ userRouter.post("/signin", async (req, res) => {
         return err.message;
       });
       logger.warn("Sign in failed: invalid input", { error: formattedError });
-      return res.status(401).json({ success: false, errors: formattedError });
+      return res.status(401).json({
+        success: false,
+        message: "Sign in failed: invalid input",
+        error: formattedError,
+      });
     }
     const { email, password } = parsedData.data;
     const user = await findUser(email);
@@ -83,10 +94,12 @@ userRouter.post("/signin", async (req, res) => {
     res.status(200).json({
       success: true,
       message: "Signin successful",
-      user: {
-        id,
-        name: user.name,
-        email,
+      data: {
+        user: {
+          id,
+          name: user.name,
+          email,
+        },
       },
     });
     logger.info(`User signed in successfully ${email}`);

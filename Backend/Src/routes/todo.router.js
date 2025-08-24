@@ -6,19 +6,18 @@ import createTodoSchema from "../schemas/create.todo.schema.js";
 import logger from "../config/logger.js";
 import userModel from "../models/user.model.js";
 import todoModel from "../models/todo.model.js";
-import { success } from "zod";
+import updateTodoSchema from "../schemas/update.todo.js";
+
 
 todoRouter.post("/create", isAuthenticated, async (req, res) => {
   try {
     const validationResult = createTodoSchema.safeParse(req.body);
     if (!validationResult.success) {
-      const formattedError = validationResult.error.issues.map((err) => {
-        return err.message;
-      });
+      c;
       logger.warn("Todo creation failed in failed: invalid input", {
         error: formattedError,
       });
-      return res.status(401).json({ success: false, errors: formattedError });
+      return res.status(401).json({ success: false, error: formattedError });
     }
     const { title, description } = validationResult.data;
     const creator = req.user;
@@ -27,14 +26,14 @@ todoRouter.post("/create", isAuthenticated, async (req, res) => {
     await userModel.findByIdAndUpdate(_id, { $push: { todos: newTodo._id } });
     res
       .status(201)
-      .json({ success: true, message: "Todo created", todo: newTodo });
+      .json({ success: true, message: "Todo created", data: {todo: newTodo} });
   } catch (error) {
     logger.error(`Error while creating todo error - ${error.message}`, {
       stack: error.stack,
     });
     res
       .status(500)
-      .json({ success: false, message: "Error while creating todo" });
+      .json({ success: false, message: "Error while creating todo", error: error.message });
   }
 });
 
@@ -48,13 +47,13 @@ todoRouter.get("/todos", isAuthenticated, async (req, res) => {
     }
     res
       .status(200)
-      .json({ success: true, message: "Sent all todos", todos: todos });
+      .json({ success: true, message: "Sent all todos", data: {todo: todos} });
     logger.info(`Sent all todos to the user - ${req.user.email}`);
   } catch (error) {
     logger.error(`Error while sending all todos - ${error.message}`, {
       stack: error.stack,
     });
-    res.status(500).json({ success: false, message: "Internal server error" });
+    res.status(500).json({ success: false, message: "Internal server error", error: error.message });
   }
 });
 
@@ -67,12 +66,57 @@ todoRouter.get("/todo/:id", isAuthenticated, async (req, res) => {
       res.status(404).json({ success: false, message: "No todo found" });
       return;
     }
-    res.status(200).json({ success: true, message: "Found Todo", todo: todo });
+    res.status(200).json({ success: true, message: "Found Todo", data: {todo: todo} });
   } catch (error) {
     logger.error(`Error while sending todo error - ${error.message}`, {
       stack: error.stack,
     });
-    res.status(500).json({ success: false, message: "Internal server error" });
+    res.status(500).json({ success: false, message: "Internal server error", error: error.message });
+  }
+});
+
+todoRouter.post("/update/:id", isAuthenticated, async (req, res) => {
+  try {
+    const validationResult = updateTodoSchema.safeParse(req.body);
+    if (!validationResult.success) {
+      const formattedError = validationResult.error.issues.map((err) => {
+        return err.message;
+      });
+      logger.info(
+        `Failed to update todo for user - ${req.user.email} due to invalid input`
+      );
+      return res.status(401).json({ success: false, message: "Failed to update todo due to invalid input", error: formattedError });
+    }
+    const _id = req.params.id;
+    const { title, description } = validationResult.data;
+    console.log("description ", typeof description)
+    const updateData = {};
+    if (title !== "" && title !== undefined) updateData.title = title;
+    if (description !== "" && description !== undefined) updateData.description = description;
+    if (Object.keys(updateData).length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "At least one field (title or description) must be provided",
+      });
+    }
+    const updatedTodo = await todoModel.findByIdAndUpdate(
+      _id,
+      { $set: updateData },
+      {
+        new: true,
+      }
+    );
+
+    logger.info(`Updated todo for user - ${req.user.email}`);
+    res
+      .status(200)
+      .json({ success: true, message: "Updated todo successfully", data: {todo: updatedTodo} });
+  } catch (error) {
+    logger.error(
+      `Error while updating todo for user - ${req.user.email} error - ${error.message}`,
+      { stack: error.stack }
+    );
+    res.status(500).json({ success: false, message: "Internal server error", error: error.message });
   }
 });
 

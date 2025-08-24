@@ -23,7 +23,10 @@ function verifyToken(req, res, next) {
     });
     res
       .status(403)
-      .json({ success: false, message: "Invalid or expired authentication token" });
+      .json({
+        success: false,
+        message: "Invalid or expired authentication token",
+      });
   }
 }
 

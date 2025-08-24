@@ -3,10 +3,12 @@ import * as z from "zod";
 const signupSchema = z.object({
   name: z
     .string()
+    .trim()
     .min(3, { message: "Name must contain atleat 3 characters" })
     .max(50, { message: "Name must not exceed 50 characters" }),
   email: z
     .string()
+    .trim()
     .email({ message: "Please enter a valid email" })
     .refine(
       (val) => {
@@ -26,6 +28,7 @@ const signupSchema = z.object({
     ),
   password: z
     .string()
+    .trim()
     .min(8, { message: "Password must contain 8 characters" })
     .max(18, { message: "Password must not exceed 18 characters" })
     .regex(/[~!@#$%^&*()_+\-=\[\]{}|;:'",.<>/?]/, {
