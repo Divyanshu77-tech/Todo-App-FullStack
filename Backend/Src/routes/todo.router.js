@@ -7,7 +7,7 @@ import logger from "../config/logger.js";
 import userModel from "../models/user.model.js";
 import todoModel from "../models/todo.model.js";
 import updateTodoSchema from "../schemas/update.todo.js";
-import { success } from "zod";
+import mongoose from "mongoose";
 
 todoRouter.post("/create", isAuthenticated, async (req, res) => {
   try {
@@ -157,6 +157,7 @@ todoRouter.delete("/delete/:id", isAuthenticated, async (req, res) => {
         .status(404)
         .json({ success: false, message: "Todo not found" });
     }
+    await userModel.findByIdAndUpdate(req.user.id, { $pull: { todos: _id } });
     logger.info(`Delete todo for user - ${req.user.email}`);
     res.status(200).json({ success: true, message: "Deleted todo" });
   } catch (error) {
