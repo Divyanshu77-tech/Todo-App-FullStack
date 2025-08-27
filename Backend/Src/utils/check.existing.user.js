@@ -4,7 +4,6 @@ import logger from "../config/logger.js";
 async function checkExistingUser(email) {
   try {
     const existingUser = await userModel.findOne({ email });
-    console.log(existingUser);
     return existingUser;
   } catch (error) {
     logger.error(`Existing user check failed error - ${error.message}`, {

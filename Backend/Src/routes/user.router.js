@@ -10,7 +10,7 @@ import findUser from "../utils/find.user.js";
 import comparePassword from "../utils/compare.pass.js";
 import verifyToken from "../middleware/verifyToken.js";
 import logger from "../config/logger.js";
-import { success } from "zod";
+
 
 userRouter.post("/signup", async (req, res) => {
   try {
